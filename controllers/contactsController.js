@@ -10,6 +10,7 @@ const addSchema = Joi.object({
 
 const listContactsController = async (req, res, next) => {
   const result = await contactsMethods.listContacts();
+  console.log('test :>> ');
   res.json(result);
 };
 
