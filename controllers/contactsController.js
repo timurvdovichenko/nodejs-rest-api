@@ -1,22 +1,19 @@
-const Joi = require('joi');
-const contactsMethods = require('../models/contacts');
 const { HttpError, controllerWrapper } = require('../helpers');
-
-const addSchema = Joi.object({
-  name: Joi.string().required(),
-  phone: Joi.string().required(),
-  email: Joi.string().required(),
-});
+const {
+  Contact,
+  schemaJoiValidation,
+  updateFovoriteJoiValidation,
+} = require('../schemas/contactSchema');
 
 const listContactsController = async (req, res, next) => {
-  const result = await contactsMethods.listContacts();
-  console.log('test :>> ');
+  const result = await Contact.find({}, '-createdAt -updatedAt');
   res.json(result);
 };
 
 const getContactByIdController = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await contactsMethods.getContactById(contactId);
+
+  const result = await Contact.findById(contactId);
 
   if (!result) {
     throw HttpError(404, 'Not Found');
@@ -26,7 +23,7 @@ const getContactByIdController = async (req, res, next) => {
 
 const removeContactController = async (req, res) => {
   const { contactId } = req.params;
-  const result = await contactsMethods.removeContact(contactId);
+  const result = await Contact.findByIdAndDelete(contactId);
 
   if (!result) {
     throw HttpError(404, 'Not Found');
@@ -36,19 +33,20 @@ const removeContactController = async (req, res) => {
 };
 
 const addContactController = async (req, res) => {
-  const { error } = addSchema.validate(req.body);
+  const { error } = schemaJoiValidation.validate(req.body);
 
   if (error) {
     const errorField = error.details[0].path[0];
-    throw HttpError(400, `missing required ${errorField} field`);
+    throw HttpError(400, `missing required (${errorField}) field`);
   }
 
-  const result = await contactsMethods.addContact(req.body);
+  const result = await Contact.create(req.body);
   res.status(201).json(result);
 };
 
 const updateContactController = async (req, res) => {
-  const { error } = addSchema.validate(req.body);
+  console.log('sfeds');
+  const { error } = schemaJoiValidation.validate(req.body);
 
   if (error) {
     throw HttpError(400, `missing fields`);
@@ -56,7 +54,26 @@ const updateContactController = async (req, res) => {
 
   const { contactId } = req.params;
 
-  const result = await contactsMethods.updateContact(contactId, req.body);
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, { new: true });
+
+  if (!result) {
+    throw HttpError(404, 'Not Found');
+  }
+
+  res.status(200).json(result);
+};
+
+const updateFavoriteController = async (req, res) => {
+  console.log('object');
+  const { error } = updateFovoriteJoiValidation.validate(req.body);
+
+  if (error) {
+    throw HttpError(400, `missing field (favorite)`);
+  }
+
+  const { contactId } = req.params;
+
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, { new: true });
 
   if (!result) {
     throw HttpError(404, 'Not Found');
@@ -71,4 +88,5 @@ module.exports = {
   removeContactController: controllerWrapper(removeContactController),
   addContactController: controllerWrapper(addContactController),
   updateContactController: controllerWrapper(updateContactController),
+  updateFavoriteController: controllerWrapper(updateFavoriteController),
 };
