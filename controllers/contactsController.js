@@ -45,7 +45,6 @@ const addContactController = async (req, res) => {
 };
 
 const updateContactController = async (req, res) => {
-  console.log('sfeds');
   const { error } = schemaJoiValidation.validate(req.body);
 
   if (error) {
@@ -64,11 +63,10 @@ const updateContactController = async (req, res) => {
 };
 
 const updateFavoriteController = async (req, res) => {
-  console.log('object');
   const { error } = updateFovoriteJoiValidation.validate(req.body);
 
   if (error) {
-    throw HttpError(400, `missing field (favorite)`);
+    throw HttpError(400, `missing field favorite`);
   }
 
   const { contactId } = req.params;
@@ -76,7 +74,7 @@ const updateFavoriteController = async (req, res) => {
   const result = await Contact.findByIdAndUpdate(contactId, req.body, { new: true });
 
   if (!result) {
-    throw HttpError(404, 'Not Found');
+    throw HttpError(400, 'Not Found');
   }
 
   res.status(200).json(result);
