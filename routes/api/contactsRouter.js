@@ -8,19 +8,26 @@ const {
   addContactController,
   updateContactController,
 } = require('../../controllers');
-const { isValidId } = require('../../middlewares');
+const { isValidId, validateBody, validateFavoriteBody } = require('../../middlewares');
 const { updateFavoriteController } = require('../../controllers/contactsController');
+
+const { schemaJoiValidation, updateFovoriteJoiValidation } = require('../../schemas/contactSchema');
 
 router.get('/', listContactsController);
 
 router.get('/:contactId', isValidId, getContactByIdController);
 
-router.post('/', addContactController);
+router.post('/', validateBody(schemaJoiValidation), addContactController);
 
 router.delete('/:contactId', isValidId, removeContactController);
 
-router.patch('/:contactId/favorite', isValidId, updateFavoriteController);
+router.patch(
+  '/:contactId/favorite',
+  isValidId,
+  validateFavoriteBody(updateFovoriteJoiValidation),
+  updateFavoriteController,
+);
 
-router.put('/:contactId', isValidId, updateContactController);
+router.put('/:contactId', isValidId, validateBody(schemaJoiValidation), updateContactController);
 
 module.exports = router;
