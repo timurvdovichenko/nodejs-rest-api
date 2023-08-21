@@ -2,7 +2,10 @@ const { HttpError, controllerWrapper } = require('../helpers');
 const { Contact } = require('../schemas/contactSchema');
 
 const listContactsController = async (req, res, next) => {
-  const result = await Contact.find({}, '-createdAt -updatedAt');
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const result = await Contact.find({ owner }, '-createdAt -updatedAt', { skip, limit });
   res.json(result);
 };
 
@@ -29,7 +32,10 @@ const removeContactController = async (req, res) => {
 };
 
 const addContactController = async (req, res) => {
-  const result = await Contact.create(req.body);
+  console.log('req.user :>> ', req.user);
+  const { _id: owner } = req.user;
+  const result = await Contact.create({ ...req.body, owner });
+  // const result = await Contact.create(req.body);
   res.status(201).json(result);
 };
 
