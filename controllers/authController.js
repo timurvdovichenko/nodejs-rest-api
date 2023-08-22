@@ -44,7 +44,17 @@ const logoutController = async (req, res) => {
   await User.findByIdAndUpdate(_id, { token: '' });
 
   res.status(204).json({ message: '' });
-  // res.status(204);
+};
+
+const subscriptionController = async (req, res) => {
+  const { _id } = req.user;
+  const { subscription } = req.body;
+  const result = await User.findByIdAndUpdate(_id, { subscription: subscription }, { new: true });
+  if (!result) {
+    throw HttpError(404, 'Not Found');
+  }
+
+  res.status(200).json(result);
 };
 
 module.exports = {
@@ -52,4 +62,5 @@ module.exports = {
   loginController: controllerWrapper(loginController),
   getCurrentController: controllerWrapper(getCurrentController),
   logoutController: controllerWrapper(logoutController),
+  subscriptionController: controllerWrapper(subscriptionController),
 };

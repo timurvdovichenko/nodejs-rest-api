@@ -46,6 +46,11 @@ const loginSchema = Joi.object({
     .required()
     .messages({ '*': 'Помилка від Joi або іншої бібліотеки валідації' }),
 });
+
+const updateSubscriptionJoiValidation = Joi.object({
+  subscription: Joi.string().required().valid('pro', 'starter', 'business'),
+});
+
 const User = model('users', userSchema);
 
-module.exports = { User, registerSchema, loginSchema };
+module.exports = { User, registerSchema, loginSchema, updateSubscriptionJoiValidation };
