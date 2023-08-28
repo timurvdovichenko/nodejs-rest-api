@@ -25,7 +25,12 @@ const registerController = async (req, res) => {
 
 const loginController = async (req, res) => {
   const { email, password } = req.body;
+  // console.log('email :>> ', email);
+  // console.log('password :>> ', password);
   const user = await User.findOne({ email });
+
+  // console.log('user :>> ', user);
+
   if (!user) {
     throw HttpError(401, 'Email or password is wrong');
   }

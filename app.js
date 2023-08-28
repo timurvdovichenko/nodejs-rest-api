@@ -19,7 +19,7 @@ app.use('/api/contacts', contactsRouter);
 app.use('/users', userAuthRouter);
 
 app.use((req, res) => {
-  console.log('res :>> ', res);
+  // console.log('res :>> ', res);
   res.status(404).json({ message: 'Not found' });
 });
 
