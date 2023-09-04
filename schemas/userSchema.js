@@ -1,3 +1,4 @@
+/* eslint-disable*/
 const { Schema, model } = require('mongoose');
 const { handleMongooseError } = require('../helpers');
 const Joi = require('joi');
@@ -19,6 +20,15 @@ const userSchema = new Schema(
     },
     token: { type: String, default: '' },
     avatarURL: { type: String, required: true },
+
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, 'Verify token is required'],
+    },
   },
   { versionKey: false, timestamps: true },
 );
@@ -35,6 +45,13 @@ const registerSchema = Joi.object({
     .required()
     .messages({ '*': 'Помилка від Joi або іншої бібліотеки валідації' }),
   subscription: Joi.string(),
+});
+
+const emailSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .pattern(emailRegexp)
+    .messages({ '*': 'missing required field email' }),
 });
 
 const loginSchema = Joi.object({
@@ -54,4 +71,10 @@ const updateSubscriptionJoiValidation = Joi.object({
 
 const User = model('users', userSchema);
 
-module.exports = { User, registerSchema, loginSchema, updateSubscriptionJoiValidation };
+module.exports = {
+  User,
+  registerSchema,
+  loginSchema,
+  emailSchema,
+  updateSubscriptionJoiValidation,
+};
